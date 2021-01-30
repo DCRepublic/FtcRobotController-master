@@ -52,7 +52,7 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Basic: Linear Arcade OpMode", group="Linear Opmode")
+@TeleOp(name="Teleop Linear Arcade OpMode 2020-2021", group="Linear Opmode")
 //@Disabled
 public class Teleop_Linear_Arcade extends LinearOpMode {
 
@@ -113,7 +113,7 @@ public class Teleop_Linear_Arcade extends LinearOpMode {
             //Check if start is pressed (intake toggle button) if on turn off or vice versa
             if (gamepad1.start && !intakeChanged) {
                 if (intake.getPower() == 1){
-                    intake.setPower(0.5);
+                    intake.setPower(0);
                 } else {
                     intake.setPower(1);
                 }
@@ -123,45 +123,43 @@ public class Teleop_Linear_Arcade extends LinearOpMode {
                 intakeChanged = false;
             }
 
-            //FIX INTAKE
-
-            if (gamepad1.right_stick_x == 0){
-                leftBackDrive.setPower(forward * -gamepad1.right_stick_y);
-                leftFrontDrive.setPower(forward * -gamepad1.right_stick_y);
-                rightBackDrive.setPower(forward * -gamepad1.right_stick_y);
-                rightFrontDrive.setPower(forward * -gamepad1.right_stick_y);
+            if (gamepad1.left_stick_x == 0){
+                leftBackDrive.setPower(forward * -gamepad1.left_stick_y);
+                leftFrontDrive.setPower(forward * -gamepad1.left_stick_y);
+                rightBackDrive.setPower(forward * -gamepad1.left_stick_y);
+                rightFrontDrive.setPower(forward * -gamepad1.left_stick_y);
 
             }
-            else if (-gamepad1.right_stick_y == 0){
-                leftBackDrive.setPower(forward * gamepad1.right_stick_x);
-                leftFrontDrive.setPower(backward * gamepad1.right_stick_x);
-                rightBackDrive.setPower(forward * gamepad1.right_stick_x);
-                rightFrontDrive.setPower(backward * gamepad1.right_stick_x);
+            else if (-gamepad1.left_stick_y == 0){
+                leftBackDrive.setPower(forward * gamepad1.left_stick_x);
+                leftFrontDrive.setPower(backward * gamepad1.left_stick_x);
+                rightBackDrive.setPower(forward * gamepad1.left_stick_x);
+                rightFrontDrive.setPower(backward * gamepad1.left_stick_x);
 
             }
-            else if((gamepad1.right_stick_x*-gamepad1.right_stick_y)>0){
-                if(gamepad1.right_stick_x > 0){
-                    leftFrontDrive.setPower(forward);
-                    rightBackDrive.setPower(forward);
-                }
-                else{
-                    leftFrontDrive.setPower(-forward);
-                    rightBackDrive.setPower(-forward);
-                }
-                leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            }
-            else if((gamepad1.right_stick_x*-gamepad1.right_stick_y)<0){
-                if(gamepad1.right_stick_x < 0){
+            else if((gamepad1.left_stick_x*-gamepad1.left_stick_y)>0){
+                if(gamepad1.left_stick_x > 0){
                     rightFrontDrive.setPower(forward);
-                    leftBackDrive.setPower((forward));
+                    leftBackDrive.setPower(forward);
                 }
                 else{
                     rightFrontDrive.setPower(-forward);
                     leftBackDrive.setPower(-forward);
                 }
-                leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                 rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            }
+            else if((gamepad1.left_stick_x*-gamepad1.left_stick_y)<0){
+                if(gamepad1.left_stick_x < 0){
+                    leftFrontDrive.setPower(forward);
+                    rightBackDrive.setPower((forward));
+                }
+                else{
+                    leftFrontDrive.setPower(-forward);
+                    rightBackDrive.setPower(-forward);
+                }
+                rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             }
 
 
