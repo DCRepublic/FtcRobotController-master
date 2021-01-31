@@ -83,7 +83,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class ColorSensor extends LinearOpMode {
 
     /** The colorSensor field will contain a reference to our color sensor hardware object */
-    NormalizedColorSensor colorSensor;
+    NormalizedColorSensor colorSensorL;
+    NormalizedColorSensor colorSensorR;
 
     /** The relativeLayout field is used to aid in providing interesting visual feedback
      * in this sample application; you probably *don't* need this when you use a color sensor on your
@@ -137,7 +138,8 @@ public class ColorSensor extends LinearOpMode {
         // hue, the second element (1) will contain the saturation, and the third element (2) will
         // contain the value. See http://web.archive.org/web/20190311170843/https://infohost.nmt.edu/tcc/help/pubs/colortheory/web/hsv.html
         // for an explanation of HSV color.
-        final float[] hsvValues = new float[3];
+        final float[] hsvValuesR = new float[3];
+        final float[] hsvValuesL = new float[3];
 
         // xButtonPreviouslyPressed and xButtonCurrentlyPressed keep track of the previous and current
         // state of the X button on the gamepad
@@ -147,12 +149,16 @@ public class ColorSensor extends LinearOpMode {
         // Get a reference to our sensor object. It's recommended to use NormalizedColorSensor over
         // ColorSensor, because NormalizedColorSensor consistently gives values between 0 and 1, while
         // the values you get from ColorSensor are dependent on the specific sensor you're using.
-        colorSensor = hardwareMap.get(NormalizedColorSensor.class, "sensor_color");
+        colorSensorL = hardwareMap.get(NormalizedColorSensor.class, "sensor_colorL");
+        colorSensorR = hardwareMap.get(NormalizedColorSensor.class, "sensor_colorR");
 
         // If possible, turn the light on in the beginning (it might already be on anyway,
         // we just make sure it is if we can).
-        if (colorSensor instanceof SwitchableLight) {
-            ((SwitchableLight)colorSensor).enableLight(true);
+        if (colorSensorR instanceof SwitchableLight) {
+            ((SwitchableLight)colorSensorR).enableLight(true);
+        }
+        if (colorSensorL instanceof SwitchableLight) {
+            ((SwitchableLight)colorSensorL).enableLight(true);
         }
 
         // Wait for the start button to be pressed.
@@ -177,8 +183,8 @@ public class ColorSensor extends LinearOpMode {
 
             // Tell the sensor our desired gain value (normally you would do this during initialization,
             // not during the loop)
-            colorSensor.setGain(gain);
-
+            colorSensorR.setGain(gain);
+            colorSensorL.setGain(gain);
             // Check the status of the X button on the gamepad
             xButtonCurrentlyPressed = gamepad1.x;
 
@@ -186,16 +192,24 @@ public class ColorSensor extends LinearOpMode {
             if (xButtonCurrentlyPressed != xButtonPreviouslyPressed) {
                 // If the button is (now) down, then toggle the light
                 if (xButtonCurrentlyPressed) {
-                    if (colorSensor instanceof SwitchableLight) {
-                        SwitchableLight light = (SwitchableLight)colorSensor;
+                    if (colorSensorR instanceof SwitchableLight) {
+                        SwitchableLight light = (SwitchableLight)colorSensorR;
                         light.enableLight(!light.isLightOn());
                     }
+                    if (colorSensorL instanceof SwitchableLight) {
+                        SwitchableLight light = (SwitchableLight)colorSensorL;
+                        light.enableLight(!light.isLightOn());
+                    }
+
+
+
                 }
             }
             xButtonPreviouslyPressed = xButtonCurrentlyPressed;
 
             // Get the normalized colors from the sensor
-            NormalizedRGBA colors = colorSensor.getNormalizedColors();
+            NormalizedRGBA colorsR = colorSensorR.getNormalizedColors();
+            NormalizedRGBA colorsL = colorSensorL.getNormalizedColors();
 
             /* Use telemetry to display feedback on the driver station. We show the red, green, and blue
              * normalized values from the sensor (in the range of 0 to 1), as well as the equivalent
@@ -203,31 +217,46 @@ public class ColorSensor extends LinearOpMode {
              * for an explanation of HSV color. */
 
             // Update the hsvValues array by passing it to Color.colorToHSV()
-            Color.colorToHSV(colors.toColor(), hsvValues);
+            Color.colorToHSV(colorsR.toColor(), hsvValuesR);
+            Color.colorToHSV(colorsL.toColor(), hsvValuesL);
 
+            /*
             telemetry.addLine()
                     .addData("Red", "%.3f", colors.red)
                     .addData("Green", "%.3f", colors.green)
                     .addData("Blue", "%.3f", colors.blue);
+
+             */
+            //Right Side
             telemetry.addLine()
-                    .addData("Hue", "%.3f", hsvValues[0])
-                    .addData("Saturation", "%.3f", hsvValues[1])
-                    .addData("Value", "%.3f", hsvValues[2]);
-            telemetry.addData("Alpha", "%.3f", colors.alpha);
+                    .addData("Hue_R", "%.3f", hsvValuesR[0])
+                    .addData("Saturation_R", "%.3f", hsvValuesR[1])
+                    .addData("Value_R", "%.3f", hsvValuesR[2])
+                    .addData("Color_R", Color.HSVToColor(hsvValuesR));
+
+            //Left Side
+            telemetry.addLine()
+                    .addData("Hue_L", "%.3f", hsvValuesL[0])
+                    .addData("Saturation_L", "%.3f", hsvValuesL[1])
+                    .addData("Value_L", "%.3f", hsvValuesL[2])
+                    .addData("Color_L", Color.HSVToColor(hsvValuesL));
+
+            telemetry.addData("Alpha_R(NOT SURE WE NEED THIS)", "%.3f", colorsR.alpha);
 
             /* If this color sensor also has a distance sensor, display the measured distance.
              * Note that the reported distance is only useful at very close range, and is impacted by
              * ambient light and surface reflectivity. */
-            if (colorSensor instanceof DistanceSensor) {
-                telemetry.addData("Distance (cm)", "%.3f", ((DistanceSensor) colorSensor).getDistance(DistanceUnit.CM));
+            if (colorSensorR instanceof DistanceSensor) {
+                telemetry.addData("Distance (cm)", "%.3f", ((DistanceSensor) colorSensorR).getDistance(DistanceUnit.CM));
             }
 
             telemetry.update();
 
             // Change the Robot Controller's background color to match the color detected by the color sensor.
+            //Havent gotten this to work yet
             relativeLayout.post(new Runnable() {
                 public void run() {
-                    relativeLayout.setBackgroundColor(Color.HSVToColor(hsvValues));
+                    relativeLayout.setBackgroundColor(Color.HSVToColor(hsvValuesR));
                 }
             });
         }
