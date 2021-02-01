@@ -79,9 +79,9 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-@TeleOp(name = "TenserFlow Test", group = "Linear Opmode")
+@TeleOp(name = "TenserFlow Ring Detect", group = "Linear Opmode")
 
-public class VuMark_ID_Webcam extends LinearOpMode {
+public class TenserFlow_Ring_Detect extends LinearOpMode {
     private static final String TFOD_MODEL_ASSET = "UltimateGoal.tflite";
     private static final String LABEL_FIRST_ELEMENT = "Quad";
     private static final String LABEL_SECOND_ELEMENT = "Single";

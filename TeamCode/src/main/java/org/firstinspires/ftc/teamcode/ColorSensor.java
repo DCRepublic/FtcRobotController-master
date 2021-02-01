@@ -140,11 +140,15 @@ public class ColorSensor extends LinearOpMode {
         // for an explanation of HSV color.
         final float[] hsvValuesR = new float[3];
         final float[] hsvValuesL = new float[3];
+        float[] LineHSValues = new float[3];
+
 
         // xButtonPreviouslyPressed and xButtonCurrentlyPressed keep track of the previous and current
         // state of the X button on the gamepad
         boolean xButtonPreviouslyPressed = false;
         boolean xButtonCurrentlyPressed = false;
+
+        boolean isCalibrated = false;
 
         // Get a reference to our sensor object. It's recommended to use NormalizedColorSensor over
         // ColorSensor, because NormalizedColorSensor consistently gives values between 0 and 1, while
@@ -169,8 +173,13 @@ public class ColorSensor extends LinearOpMode {
             // Explain basic gain information via telemetry
             telemetry.addLine("Hold the A button on gamepad 1 to increase gain, or B to decrease it.\n");
             telemetry.addLine("Higher gain values mean that the sensor will report larger numbers for Red, Green, and Blue, and Value\n");
+            telemetry.addLine("Right Bumper to calibrate sensor to current Line.\n")
+                     .addData("Is Calibrated: ", isCalibrated);
+
 
             // Update the gain value if either of the A or B gamepad buttons is being held
+
+
             if (gamepad1.a) {
                 // Only increase the gain by a small amount, since this loop will occur multiple times per second.
                 gain += 0.005;
@@ -220,6 +229,11 @@ public class ColorSensor extends LinearOpMode {
             Color.colorToHSV(colorsR.toColor(), hsvValuesR);
             Color.colorToHSV(colorsL.toColor(), hsvValuesL);
 
+            if(gamepad1.right_bumper){
+                isCalibrated = true;
+                LineHSValues = hsvValuesR;
+            }
+
             /*
             telemetry.addLine()
                     .addData("Red", "%.3f", colors.red)
@@ -231,15 +245,14 @@ public class ColorSensor extends LinearOpMode {
             telemetry.addLine()
                     .addData("Hue_R", "%.3f", hsvValuesR[0])
                     .addData("Saturation_R", "%.3f", hsvValuesR[1])
-                    .addData("Value_R", "%.3f", hsvValuesR[2])
-                    .addData("Color_R", Color.HSVToColor(hsvValuesR));
+                    .addData("Value_R", "%.3f", hsvValuesR[2]);
+
 
             //Left Side
             telemetry.addLine()
                     .addData("Hue_L", "%.3f", hsvValuesL[0])
                     .addData("Saturation_L", "%.3f", hsvValuesL[1])
-                    .addData("Value_L", "%.3f", hsvValuesL[2])
-                    .addData("Color_L", Color.HSVToColor(hsvValuesL));
+                    .addData("Value_L", "%.3f", hsvValuesL[2]);
 
             telemetry.addData("Alpha_R(NOT SURE WE NEED THIS)", "%.3f", colorsR.alpha);
 
